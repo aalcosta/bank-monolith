@@ -10,6 +10,11 @@ public class RestHeader {
     public String name;
     public String value;
 
+    public RestHeader() {
+        this.name = name;
+        this.value = value;
+    }
+
     public RestHeader(String name, String value) {
         this.name = name;
         this.value = value;

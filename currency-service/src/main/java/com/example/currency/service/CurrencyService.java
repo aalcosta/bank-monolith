@@ -1,6 +1,7 @@
 package com.example.currency.service;
 
 import com.example.currency.domain.Currency;
+import com.example.currency.exception.UnsupportedCurrencyException;
 import com.example.currency.repository.CurrencyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,13 @@ public class CurrencyService {
     }
 
     public BigDecimal convert(BigDecimal sourceValue, String sourceCurrency, String targetCurrency) throws UnsupportedCurrencyException {
-        BigDecimal toBaseRate = repo.findById(sourceCurrency)
-                .map(Currency::getConversionRate)
-                .orElseThrow(() -> new UnsupportedCurrencyException());
-        BigDecimal fromBaseRate = repo.findById(targetCurrency)
-                .map(Currency::getConversionRate)
-                .orElseThrow(() -> new UnsupportedCurrencyException());
-        return sourceValue.multiply(toBaseRate).divide(fromBaseRate).setScale(2, RoundingMode.HALF_UP);
+        Currency toBaseRate = repo.findById(sourceCurrency).orElseThrow(() -> new UnsupportedCurrencyException());
+        Currency fromBaseRate = repo.findById(targetCurrency).orElseThrow(() -> new UnsupportedCurrencyException());
+        return convert(sourceValue, toBaseRate.getConversionRate(), fromBaseRate.getConversionRate());
+    }
+
+    public BigDecimal convert(BigDecimal sourceValue, BigDecimal toBaseRate, BigDecimal fromBaseRate) {
+        return sourceValue.multiply(toBaseRate).divide(fromBaseRate,2, RoundingMode.HALF_UP);
     }
 
     public List<Currency> findAll() {

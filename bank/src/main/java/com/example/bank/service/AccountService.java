@@ -56,7 +56,7 @@ public class AccountService {
     public void deposit(String accountNumber, CurrencyValue movementValue) {
         Account account = getAccount(accountNumber);
         BigDecimal amount = currencyService.convert(movementValue, account.getCurrency().getAcronym()).getValue();
-        account.setBalance(account.getBalance().add(amount).setScale(2, RoundingMode.HALF_UP));
+        account.addBalance(amount);
         accountRepo.save(account);
     }
 
@@ -70,7 +70,7 @@ public class AccountService {
             throw new InsufficientFoundsException();
         }
 
-        account.setBalance(accountBalance.subtract(amount).setScale(2, RoundingMode.HALF_UP));
+        account.subtractBalance(amount);
         accountRepo.save(account);
     }
 

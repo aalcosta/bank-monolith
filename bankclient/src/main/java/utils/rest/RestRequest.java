@@ -24,7 +24,8 @@ public class RestRequest {
     public RestRequest(String method, String url, Object body, RestHeader... headers) {
         this(method, url);
         this.body = body;
-        this.headers.addAll(Arrays.asList(headers));
+        final List<utils.rest.RestHeader> c = Arrays.asList(headers);
+        this.headers.addAll(c);
     }
 
     @Override

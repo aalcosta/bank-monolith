@@ -131,7 +131,7 @@ public class AdminController {
     @Path("/account/transfer")
     public Response transfer(AccountMovement movement) {
         try {
-            CurrencyValue currencyValue = CurrencyValue.builder().currency(movement.getCurrency()).value(movement.getValue()).build();
+            CurrencyValue currencyValue = CurrencyValue.builder().acronym(movement.getCurrency()).value(movement.getValue()).build();
             accountService.transfer(movement.getOriginAccount(), movement.getDestinationAccount(), currencyValue);
             return Response.ok().build();
         } catch (AccountNumberNotFoundException e) {

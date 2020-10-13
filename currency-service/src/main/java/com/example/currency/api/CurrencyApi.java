@@ -1,6 +1,7 @@
 package com.example.currency.api;
 
 import com.example.currency.domain.Currency;
+import com.example.currency.exception.UnsupportedCurrencyException;
 import com.example.currency.service.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,44 +22,49 @@ import java.util.Optional;
 
 import static java.lang.Double.NaN;
 import static java.util.Objects.isNull;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static org.springframework.util.StringUtils.isEmpty;
 
 @Controller
-@Path("/api/currency")
-public class CurrencyAPI {
+@Path("/currency")
+public class CurrencyApi {
 
     private final CurrencyService currencyService;
 
     @Autowired
-    public CurrencyAPI(CurrencyService currencyService) {
+    public CurrencyApi(CurrencyService currencyService) {
         this.currencyService = currencyService;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/currency")
     public Response getAll() {
         return Response.ok(currencyService.findAll()).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/currency/{acronym}")
+    @Path("/{acronym}")
     public Response get(@PathParam("acronym") String acronym) {
-        return Response.ok(currencyService.findById(acronym)).build();
+        final Optional<Currency> currency = currencyService.findById(acronym);
+        return currency.isPresent()
+                ? Response.ok(currency).build()
+                : Response.status(NOT_FOUND).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/currency/{acronym}/quotation")
+    @Path("/{acronym}/quotation")
     public Response getQuotation(@PathParam("acronym") String acronym,
                                  @QueryParam("reference") String reference,
                                  @QueryParam("value") BigDecimal value) {
         final Optional<Currency> source = currencyService.findById(acronym);
         if (source.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(NOT_FOUND).build();
         }
 
-        final Optional<Currency> destination = currencyService.findById(reference);
+        final Optional<Currency> destination = isEmpty(reference)
+                ? Optional.of(currencyService.getBaseCurrency()) : currencyService.findById(reference);
         if (destination.isEmpty()) {
             return Response.ok(NaN).build();
         }
@@ -67,19 +73,20 @@ public class CurrencyAPI {
             value = BigDecimal.ONE;
         }
 
-        return Response.ok(currencyService.convert(value, acronym, reference)).build();
+        return Response.ok(
+                currencyService.convert(value, source.get().getConversionRate(), destination.get().getConversionRate())).build();
     }
 
     @DELETE
-    @Path("/currency/{acronym}")
-    public Response delete(@PathVariable("acronym") String acronym) {
+    @Path("/{acronym}")
+    public Response delete(@PathParam("acronym") String acronym) {
         currencyService.delete(acronym);
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/currency/{acronym}")
+    @Path("/{acronym}")
     public Response save(Currency currency) {
         currencyService.save(currency);
         return Response.ok().build();

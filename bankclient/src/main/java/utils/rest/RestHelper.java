@@ -1,10 +1,11 @@
 package utils.rest;
 
+import utils.encoding.EncodingUtils;
+
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Hashtable;
@@ -13,7 +14,6 @@ import static javax.ws.rs.HttpMethod.DELETE;
 import static javax.ws.rs.HttpMethod.GET;
 import static javax.ws.rs.HttpMethod.POST;
 import static javax.ws.rs.HttpMethod.PUT;
-import static utils.encoding.EncodingUtils.DEFAULT_CHARSET;
 
 /**
  * Created by alexandre on 8/17/16.
@@ -26,9 +26,9 @@ public class RestHelper {
         standardRequests.clear();
     }
 
-    public static void setStandardRequest(RestRequest request, RestResponse response) {
-        standardRequests.put(request, response);
-    }
+//    public static void setStandardRequest(RestRequest request, RestResponse response) {
+//        standardRequests.put(request, response);
+//    }
 
     public static Response buildCreateResponse(UriInfo uriInfo, Object resourceId) {
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
@@ -58,15 +58,12 @@ public class RestHelper {
     }
 
     public static String urlEncode(String str) {
-        try {
-            return URLEncoder.encode(str, DEFAULT_CHARSET.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return URLEncoder.encode(str, EncodingUtils.DEFAULT_CHARSET);
     }
 
     private static RestResponse executeRequest(RestRequest request) {
-        final RestResponse response = standardRequests.get(request);
+        final RestResponse restResponse = standardRequests.get(request);
+        final RestResponse response = (RestResponse) restResponse;
         return (response != null) ? response : HttpClientInvoker.doRequest(request);
     }
 

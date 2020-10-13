@@ -1,13 +1,15 @@
 package account;
 
 import currency.CurrencyValue;
-import utils.json.JsonUtils;
 import utils.rest.RestHelper;
 import utils.rest.RestResponse;
 
 import javax.ws.rs.core.HttpHeaders;
 import java.math.BigDecimal;
 import java.util.List;
+
+import static utils.json.JsonUtils.fromJson;
+import static utils.json.JsonUtils.fromJsonArray;
 
 public class AccountService {
 
@@ -22,19 +24,19 @@ public class AccountService {
 
     public List<Account> findAccounts() {
         String json = RestHelper.doGetRequest(BASE_URL).content;
-        return JsonUtils.fromJsonArray(json, Account.class);
+        return fromJsonArray(json, Account.class);
     }
 
     public Account deposit(String accountNumber, String currency, BigDecimal value) {
         CurrencyValue entity = new CurrencyValue(currency, value);
         String json = RestHelper.doPostRequest(BASE_URL + "/" + accountNumber + "/deposit", entity).content;
-        return JsonUtils.fromJson(json, Account.class);
+        return fromJson(json, Account.class);
     }
 
     public Account withdraw(String accountNumber, String currency, BigDecimal value) {
         CurrencyValue entity = new CurrencyValue(currency, value);
         String json = RestHelper.doPostRequest(BASE_URL + "/" + accountNumber + "/withdraw", entity).content;
-        return JsonUtils.fromJson(json, Account.class);
+        return fromJson(json, Account.class);
     }
 
     public void transfer(String originAccountNum, String destinationAccountNum, String currency, BigDecimal value) {

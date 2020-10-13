@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CurrencyValue {
 
-    String currency;
+    String acronym;
     BigDecimal value;
 
 }

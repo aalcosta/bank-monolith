@@ -32,13 +32,13 @@ public class CurrencyService {
     }
 
     public CurrencyValue convert(CurrencyValue source, String targetCurrency) throws UnsupportedCurrencyException {
-        if (source.getCurrency().equals(targetCurrency)) {
+        if (source.getAcronym().equals(targetCurrency)) {
             return source;
         }
 
-        BigDecimal convertedValue = convert(source.getValue(), source.getCurrency(), targetCurrency);
+        BigDecimal convertedValue = convert(source.getValue(), source.getAcronym(), targetCurrency);
         return CurrencyValue.builder()
-                .currency(targetCurrency)
+                .acronym(targetCurrency)
                 .value(convertedValue)
                 .build();
     }

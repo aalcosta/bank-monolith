@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 
 public class CurrencyValue {
 
-    private String currency;
+    private String acronym;
     private BigDecimal value;
 
     public CurrencyValue() {};
 
     public CurrencyValue(String currency, BigDecimal value) {
-        this.currency = currency;
+        this.acronym = currency;
         this.value = value;
     }
 }
